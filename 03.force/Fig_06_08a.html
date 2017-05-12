@@ -23,53 +23,6 @@ svg {
 </body>
 
 <script>
-	var marker = d3.select("svg")
-		.append('defs')
-		.append('marker')
-		.attr("id", "Triangle")
-		.attr("refX", 12)
-		.attr("refY", 6)
-		.attr("markerUnits", 'userSpaceOnUse')
-		.attr("markerWidth", 12)
-		.attr("markerHeight", 18)
-		.attr("orient", 'auto')
-		.append('path')
-		.attr("d", 'M 0 0 12 6 0 12 3 6');
-
-	function Node(id, followers, following) {
-		this.id = id;
-	}
-	function Link(source, target, weight) {
-		this.source = source;
-		this.target = target;
-		this.weight = weight;
-	}
-
-	function fixNode(d) {
-		d3.select(this).select("circle").style("stroke-width", 4);
-		d.fixed = true;
-	}
-
-	var nodes = [];
-	nodes.push(new Node('sam', 17, 500));
-	nodes.push(new Node('roy', 83, 80));
-	nodes.push(new Node('pris', 904, 15));
-	nodes.push(new Node('2pris', 904, 15));
-
-	var edges = [];
-	edges.push(new Link(nodes[0], nodes[2], 1));
-	edges.push(new Link(nodes[1], nodes[2], 5));
-
-	var weightScale = d3.scale.linear().domain(d3.extent(edges, function(d) {
-		return d.weight;
-	})).range([ .1, 1 ]);
-
-	force = d3.layout.force().charge(-1000).gravity(.3).size([ 500, 500 ]).nodes(nodes).links(edges).on("tick", forceTick);
-
-	restart();
-
-	force.start();
-
 	function forceTick() {
 		d3.selectAll("line.link")
 		.attr("x1", function(d) {
@@ -86,9 +39,57 @@ svg {
 			return "translate(" + d.x + "," + d.y + ")"
 		})
 	}
+	function fixNode(d) {
+		d3.select(this).select("circle").style("stroke-width", 4);
+		d.fixed = true;
+	}
+	// node, link 생성자
+	function Node(id) {
+		this.id = id;
+	}
+	function Link(source, target) {
+		this.source = source;
+		this.target = target;
+	}
+	var nodes = [];
+	var links = [];
+	
+	nodes.push(new Node('sam'));
+	nodes.push(new Node('roy'));
+	nodes.push(new Node('pris'));
+	nodes.push(new Node('2pris'));
+	links.push(new Link(nodes[0], nodes[2]));
+	links.push(new Link(nodes[1], nodes[2]));
+	
+	initSvg();
+	
+	function initSvg(){
+		var marker = d3.select("svg")
+		.append('defs')
+		.append('marker')
+		.attr("id", "Triangle")
+		.attr("refX", 12)
+		.attr("refY", 6)
+		.attr("markerUnits", 'userSpaceOnUse')
+		.attr("markerWidth", 12)
+		.attr("markerHeight", 18)
+		.attr("orient", 'auto')
+		.append('path')
+		.attr("d", 'M 0 0 12 6 0 12 3 6');
+		
+		var weightScale = d3.scale.linear().domain(d3.extent(links, function(d) {
+			return d.weight;
+		})).range([ .1, 1 ]);
+
+		force = d3.layout.force().charge(-1000).gravity(.3).size([ 500, 500 ]).nodes(nodes).links(links).on("tick", forceTick);
+
+		restart();
+
+		force.start();
+	}
 
 	function restart() {
-		d3.select("svg").selectAll("line.link").data(edges, function(d) {
+		d3.select("svg").selectAll("line.link").data(links, function(d) {
 			return d.source.id + "-" + d.target.id
 		}).enter()
 		.append("line")
@@ -129,9 +130,9 @@ svg {
 		var ran2 = seq++;
 
 		//add
-		nodes.push(new Node('pris' + ran, 904, 15));
-		nodes.push(new Node('pris' + ran2, 904, 15));
-		edges.push(new Link(nodes[nseq++], nodes[nseq++], 5));
+		nodes.push(new Node('pris' + ran));
+		nodes.push(new Node('pris' + ran2));
+		links.push(new Link(nodes[nseq++], nodes[nseq++]));
 
 		force.stop();
 
