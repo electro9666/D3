@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!-- // http://www.programkr.com/blog/MYjMwADMwYT0.html -->
+<script type="text/javascript" src="d3.v3.min.js"></script>
+
+</head>
+<body>
+	<p>AAAAAAAAA</p>
+	<p>BBBBBBBBB</p>
+	<p>CCCCCCCCC</p>
+
+	<script>
+		var dataset = [ 10, 20, 30, 40, 50 ];
+
+		var pp = d3.select("body").selectAll("p").data(dataset);
+
+		// 기존 3개
+		pp.text(function(d, i) {
+			return "update " + d;
+		});
+
+		// 추가된 2개
+		pp.enter().append("p").text(function(d, i) {
+			return "enter " + d;
+		});
+	</script>
+</body>
+</html>

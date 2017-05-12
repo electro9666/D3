@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+	path.link {
+	  fill: none;
+	  stroke: #000;
+	  stroke-width: 4px;
+	}
+</style>
+<script type="text/javascript" src="d3.v3.min.js"></script>
+
+</head>
+<body>
+
+<script type="text/javascript">
+	var svg = d3.select('body')
+		.append('svg')
+		.attr('width', 400)
+		.attr('height', 400)
+		.style("border", "1px solid red")
+		;
+
+	var links = [0,1,2];		
+		
+	var path = svg.append('svg:g').selectAll('path');
+	
+	restart();
+	
+	function restart(){
+		path = path.data(links);
+
+		path
+		.attr("d", function(d){
+			console.log("M");
+			return 'M111,111L222,' + Math.random()*100*d;
+		})			
+  		;
+		
+		path.enter().append('svg:path')
+			.attr('class', 'link')
+			.attr("d", function(d){
+				console.log("M");
+				return 'M111,111L222,' + Math.random()*100*d;
+			})			
+	  		;
+		path.exit().remove();
+	}
+</script>
+</body>
+</html>

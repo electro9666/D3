@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+ <head>
+   <title>Chernoff Smileys</title>
+   <!-- <script type="text/javascript" src="http://mbostock.github.com/d3/d3.js?2.5.0"></script> -->
+   <!-- <script type="text/javascript" src="http://mbostock.github.com/d3/d3.layout.js?2.5.0"></script> -->
+   <script type="text/javascript" src="d3.v3.min.js"></script>
+      <style type="text/css">
+/*        line{
+            stroke: "black";
+            stroke-width:2px;
+        }*/
+   </style>
+ </head>
+ <body>
+
+     <p>Click a Smiley<p>
+     <svg width="400" height="400" id="charts">
+        <rect width="100%" height="100%" fill="none" stroke="black" stroke-width="2px"></rect>
+     </svg>
+
+
+   <script type="text/javascript">
+
+
+    var drag = d3.behavior.drag()
+        .on("drag", function(d,i) {
+            d.x += d3.event.dx
+            d.y += d3.event.dy
+            d3.select(this).attr("transform", function(d,i){
+                return "translate(" + [ d.x,d.y ] + ")"
+            })
+        });
+
+
+face_factory("class0", 100, 100, "red");
+face_factory("class1", 200, 200, "blue");
+    function face_factory(className, x, y, color)
+    { 
+        
+        //data format
+        //{ "x": 0 - 1 , "y": 0 -1, "z": 0-1 }
+        //color could be made a parameter
+        //var arc = d3.svg.arc().outerRadius(r)
+        //var donut = d3.layout.pie();
+
+        var faceG = d3.select("#charts")
+            .append("svg:g")
+                //.data([data.sort(d3.descending)])
+                //.data([data])
+                .data([ {"x":x, "y":y} ])
+                .attr("class", className)
+                .attr("transform", "translate(" + x + "," + y + ")")
+                .on("mousedown", clickG)
+                .call(drag);
+
+        
+        d3.select("svg")
+        .on("click", clickSvg)
+        .on("mousemove", moveMoveFn);
+
+        var head = faceG.append("svg:circle")
+                .attr("class", "head")
+                .attr("fill", color)
+                .attr("fill-opacity", .8)
+                .attr("stroke", "#000")
+                .attr("stroke-width", 3)
+                .attr("r", 50)
+                .on("mouseover", mouseoverFn)
+                .on("mouseout", mouseoverFn2)
+                
+                ;
+    }
+    var seq=0;
+    var globalG = '';    
+    var globalClicked = '';
+
+    function clickG(d){
+        // d3.event.preventDefault();
+        // d3.event.stopPropagation();
+
+        console.log("mouseDown");
+        var x2 = d.x + d3.mouse(this)[0];
+        var y2 = d.y + d3.mouse(this)[1];
+        console.log(x2, y2);
+
+        var gClass = d3.select(this).attr("class");
+        if(globalG != '' && globalG != gClass){
+            d3.select("line." + globalClicked).attr("x2", d.x).attr("y2", d.y);
+
+            globalG = '';
+            globalClicked = '';
+            return;
+        }
+        globalG = gClass;
+
+        var className = "ccc" + seq++;
+        globalClicked = className; 
+        
+        console.log("globalG", globalG);
+        d3.select("svg").append("line").attr("class", className).attr("x1", d.x).attr("y1", d.y).attr("x2",x2).attr("y2",y2).style("stroke", "black").style("stroke-width","2px");
+    }
+    function clickSvg(){
+        console.log("clickSvg");
+        return;
+        if(globalClicked != ''){
+            d3.select("line." + globalClicked).remove();
+
+            globalG = '';
+            globalClicked = '';
+        } 
+
+    }
+    function moveMoveFn(){
+        if(globalClicked == ''){
+            return;
+        }
+        
+        var x2 = d3.mouse(this)[0];
+        var y2 = d3.mouse(this)[1];
+
+        d3.select("line." + globalClicked).attr("x2", x2).attr("y2", y2);
+    }
+
+    function mouseoverFn(){
+        d3.select(this).attr("stroke-width", 6);
+    }
+    function mouseoverFn2(){
+        d3.select(this).attr("stroke-width", 3);
+    }   
+
+   </script>
+ </body>
+</html>

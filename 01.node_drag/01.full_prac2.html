@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+	path.link {
+	  fill: none;
+	  stroke: #000;
+	  stroke-width: 4px;
+	}
+</style>
+<script type="text/javascript" src="d3.v3.min.js"></script>
+
+</head>
+<body>
+
+<script type="text/javascript">
+	var svg = d3.select('body')
+		.append('svg')
+		.attr('width', 400)
+		.attr('height', 400)
+		.style("border", "1px solid red")
+		;
+
+	var nodes = [{id:0, x:100, y:100}
+				,{id:1, x:200, y:200}
+				,{id:2, x:300, y:250}
+				,{id:3, x:250, y:150}
+				];
+	var links = [
+	               {s: nodes[0], t: nodes[1]},
+	               {s: nodes[1], t: nodes[2]}
+	             ];		
+	// path - like를 먼저 그린다.	
+	var path = svg.append('svg:g').selectAll('path');
+	var circle = svg.append('svg:g').selectAll('g');
+	
+	restart();
+	
+	function restart(){
+// 		console.log("restart...");
+		// 1.path
+		path = path.data(links, function(d){ return JSON.stringify(d); });
+		// 기존(수정)
+		path.attr("d", function(d){
+			console.log(1);
+			return 'M' + d.s.x + ',' + d.s.y + 'L' + d.t.x + ',' + d.t.y;
+		});			
+		// 추가
+		path.enter().append('svg:path')
+			.attr('class', 'link')
+			.attr("d", function(d){
+				console.log(1);
+				return 'M' + d.s.x + ',' + d.s.y + 'L' + d.t.x + ',' + d.t.y;
+			});
+		// 삭제
+		path.exit().remove();
+		
+		
+		
+		// 2.circle
+		circle = circle.data(nodes, function(d){ return JSON.stringify(d); });
+		
+		// 기존 수정
+		circle.attr('transform', function(d) {
+				return 'translate(' + d.x + ',' + d.y + ')';
+			});
+
+	     	var drag = d3.behavior.drag()
+		   	.on("drag", function(d,i) {
+		   			console.log("drag");
+		           d.x += d3.event.dx
+		           d.y += d3.event.dy
+		           restart();
+		   	});		
+
+		// 추가
+		var g = circle.enter()
+			.append('svg:g')
+			.attr('transform', function(d) {
+				return 'translate(' + d.x + ',' + d.y + ')';
+			})
+			.call(drag);
+		
+		g.append('svg:circle')
+			.attr('class', 'node')
+			.attr('r', 12)
+			.style('fill', "gray")
+		
+		g.append("text")
+		      .attr('x', 0)
+		      .attr('y', 4)
+		      .style("color", "black")
+		      .text(function(d) { return d.id; })
+	      ;		
+		
+		// 삭제
+		circle.exit().remove();
+	}
+</script>
+</body>
+</html>
